@@ -1,0 +1,21 @@
+{
+  "name": "nugget",
+  "version": "1.0.0",
+  "description": "minimalist wget clone written in node. HTTP GETs a file and saves it to the current working directory",
+  "main": "index.js",
+  "bin": "bin.js",
+  "scripts": {
+    "test": "node test/test.js"
+  },
+  "author": "max ogden",
+  "license": "BSD",
+  "dependencies": {
+    "minimist": "^1.1.0",
+    "progress-stream": "^0.5.0",
+    "request": "^2.45.0",
+    "single-line-log": "^0.4.1"
+  },
+  "devDependencies": {
+    "tape": "^3.0.1"
+  }
+}
