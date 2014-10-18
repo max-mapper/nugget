@@ -5,12 +5,50 @@ var log = require('single-line-log').stdout
 var progress = require('progress-stream')
 
 module.exports = function(url, opts, cb) {
-  var target = opts.o || opts.O || opts.out || path.basename(url)
-  var read = request(url)
+  opts.target = path.resolve(opts.dir || process.cwd(), opts.target || path.basename(url))
+  if (opts.resume) {
+    resume(url, opts, cb)
+  } else {
+    download(url, opts, cb)
+  }
+}
+
+function resume(url, opts, cb) {
+  fs.stat(opts.target, function (err, stats) {
+    if (err && err.code === 'ENOENT') {
+      return download(url, opts, cb)
+    }
+    if (err) {
+      return cb(err)
+    }
+    var offset = stats.size
+
+    request.head(url, function (err, resp) {
+      if (err) return cb(err)
+
+      var length = parseInt(resp.headers['content-length'], 10)
+
+      // file is already downloaded.
+      if (length === offset) return cb();
+
+      if (!isNaN(length) && length > offset && /bytes/.test(resp.headers['accept-ranges'])) {
+        opts.range = [offset, length]
+      }
+      download(url, opts, cb)
+    });
+  });
+}
+
+function download(url, opts, cb) {
+  var headers = opts.headers || {}
+  if (opts.range) {
+    headers.Range = 'bytes=' + opts.range[0] + '-' + opts.range[1]
+  }
+  var read = request(url, { headers: headers })
   read.on('error', cb)
   read.on('response', function(resp) {
-    if (resp.statusCode > 299 && !opts.f && !opts.force) return cb(new Error('GET ' + url + ' returned ' + resp.statusCode))
-    var write = fs.createWriteStream(path.join(opts.dir || process.cwd(), target))
+    if (resp.statusCode > 299 && !force) return cb(new Error('GET ' + url + ' returned ' + resp.statusCode))
+    var write = fs.createWriteStream(opts.target, {flags: 'a'})
     write.on('error', cb)
     write.on('finish', cb)
  

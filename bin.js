@@ -10,7 +10,7 @@ if (!url) {
 }
 
 var opts = {
-  target: args.o || args.O || args.out || path.basename(url),
+  target: args.o || args.O || args.out,
   dir:    args.d || args.dir,
   resume: args.c || args.continue,
   force:  args.f || args.force,
