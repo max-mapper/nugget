@@ -4,6 +4,7 @@ minimalist wget clone written in node. HTTP GETs a file and streams it into a fi
 
 [![NPM](https://nodei.co/npm/nugget.png?global=true)](https://nodei.co/npm/nugget/)
 ![dat](http://img.shields.io/badge/Development%20sponsored%20by-dat-green.svg?style=flat)
+[![Travis](http://img.shields.io/travis/maxogden/nugget.svg?style=flat)](https://travis-ci.org/maxogden/nugget)
 
 ## installation
 
