@@ -26,9 +26,10 @@ if (fs.existsSync(target)) fs.unlinkSync(target)
 
 fs.writeFileSync(target, data.slice(0, 10))
 
-testServer.listen(5000, function() {
+testServer.listen(0, function() {
+  var port = this.address().port
   test('fetches rest of file', function(t) {
-    nugget('http://localhost:5000/foobar.html', {dir: __dirname, resume: true}, function(err) {
+    nugget('http://localhost:' + port + '/foobar.html', {dir: __dirname, resume: true}, function(err) {
       t.ok(fs.existsSync(target), 'downloaded file')
       t.equal(fs.statSync(target).size, data.length, 'file is complete');
       if (fs.existsSync(target)) fs.unlinkSync(target)

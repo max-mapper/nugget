@@ -8,12 +8,13 @@ var testServer = http.createServer(function(req, res) {
   res.end('hello')
 })
 
-var target = path.join(__dirname, 'foobar.html')
+var target = path.join(__dirname, 'resume.html')
 if (fs.existsSync(target)) fs.unlinkSync(target)
 
-testServer.listen(5000, function() {
+testServer.listen(0, function() {
+  var port = this.address().port
   test('fetches file', function(t) {
-    nugget('http://localhost:5000/foobar.html', {dir: __dirname}, function(err) {
+    nugget('http://localhost:' + port + '/resume.html', {dir: __dirname}, function(err) {
       t.ok(fs.existsSync(target), 'downloaded file')
       if (fs.existsSync(target)) fs.unlinkSync(target)
       t.end()

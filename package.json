@@ -5,7 +5,7 @@
   "main": "index.js",
   "bin": "bin.js",
   "scripts": {
-    "test": "node test/test.js"
+    "test": "tape test/*.js"
   },
   "author": "max ogden",
   "license": "BSD",
