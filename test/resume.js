@@ -7,10 +7,10 @@ var test = require('tape')
 var data = new Buffer('hello everybody I am the data');
 
 var testServer = http.createServer(function(req, res) {
-  if (req.method === 'HEAD') {
+  if (!req.headers['range']) {
     res.setHeader('content-length', data.length)
     res.setHeader('accept-ranges', 'bytes')
-    res.end()
+    res.end(data)
   } else {
     var range = req.headers['range'].split('=').pop().split('-').map(function (s) {
       return parseInt(s, 10)
