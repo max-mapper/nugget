@@ -48,7 +48,7 @@ function download(url, opts, cb) {
   read.on('error', cb)
   read.on('response', function(resp) {
     if (resp.statusCode > 299 && !force) return cb(new Error('GET ' + url + ' returned ' + resp.statusCode))
-    var write = fs.createWriteStream(opts.target, {flags: 'a'})
+    var write = fs.createWriteStream(opts.target, {flags: opts.resume ? 'a' : 'w'})
     write.on('error', cb)
     write.on('finish', cb)
  
