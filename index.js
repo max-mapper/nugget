@@ -57,18 +57,19 @@ function download(url, opts, cb) {
       .pipe(progress({ length: Number(resp.headers['content-length']) }, onprogress))
       .pipe(write)
   })
+
+  function render(pct) {
+    var bar = Array(Math.floor(50 * pct / 100)).join('=')+'>'
+    while (bar.length < 50) bar += ' '
+   
+    log(
+      'Downloading '+path.basename(opts.target)+'\n'+
+      '['+bar+'] '+pct.toFixed(1)+'%   \n'
+    )
+  }
+   
+  function onprogress(p) {
+    render(p.percentage)
+  }
 }
 
-function render(pct) {
-  var bar = Array(Math.floor(50 * pct / 100)).join('=')+'>'
-  while (bar.length < 50) bar += ' '
- 
-  log(
-    'Downloading \n'+
-    '['+bar+'] '+pct.toFixed(1)+'%   \n'
-  )
-}
- 
-function onprogress(p) {
-  render(p.percentage)
-}
