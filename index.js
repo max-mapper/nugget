@@ -22,21 +22,24 @@ function resume(url, opts, cb) {
       return cb(err)
     }
     var offset = stats.size
+    var req = request.get(url)
 
-    request.head(url, function (err, resp) {
-      if (err) return cb(err)
+    req.on('error', cb)
+    req.on('response', function(resp) {
+      resp.destroy()
 
       var length = parseInt(resp.headers['content-length'], 10)
 
       // file is already downloaded.
-      if (length === offset) return cb();
+      if (length === offset) return cb()
 
       if (!isNaN(length) && length > offset && /bytes/.test(resp.headers['accept-ranges'])) {
         opts.range = [offset, length]
       }
+
       download(url, opts, cb)
-    });
-  });
+    })
+  })
 }
 
 function download(url, opts, cb) {
