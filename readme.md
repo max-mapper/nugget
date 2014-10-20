@@ -27,3 +27,12 @@ nugget http://foo.com/bar.jpg -O baz.jpg
 ```
 
 if you get a statusCode of 300 or greater nugget will stop. you can force it to stream the response into a file anyway by doing `nugget http://404link.com/file.html -f` or `--force` works too
+
+## options
+
+The following options are recognized by nugget:
+
+ * `-o|-O|--out` - specify the filename to write to.
+ * `-d|--dir` - save files in a directory other than the current one.
+ * `-c|--continue` - resume downloads if a partially complete target file already exists. If the target file exists and is the same size as the remote file, nothing will be done.
+ * `-f|--force` - force the server response to be saved to the target file, even if it's a non-successful status code.

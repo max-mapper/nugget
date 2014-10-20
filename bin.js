@@ -9,7 +9,14 @@ if (!url) {
   process.exit(1)
 }
 
-nugget(url, args, function(err) {
+var opts = {
+  target: args.o || args.O || args.out,
+  dir:    args.d || args.dir,
+  resume: args.c || args.continue,
+  force:  args.f || args.force,
+}
+
+nugget(url, opts, function(err) {
   if (err) {
     console.error('Error:', err.message)
     process.exit(1)
