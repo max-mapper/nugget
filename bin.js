@@ -10,10 +10,11 @@ if (!url) {
 }
 
 var opts = {
-  target: args.o || args.O || args.out,
-  dir:    args.d || args.dir,
-  resume: args.c || args.continue,
-  force:  args.f || args.force,
+  target:  args.o || args.O || args.out,
+  dir:     args.d || args.dir,
+  resume:  args.c || args.continue,
+  force:   args.f || args.force,
+  verbose: args.verbose === undefined ? process.stdin.isTTY : args.verbose
 }
 
 nugget(url, opts, function(err) {

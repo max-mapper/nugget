@@ -47,6 +47,7 @@ function download(url, opts, cb) {
   if (opts.range) {
     headers.Range = 'bytes=' + opts.range[0] + '-' + opts.range[1]
   }
+  var _log = opts.verbose ? log : noop
   var read = request(url, { headers: headers })
   read.on('error', cb)
   read.on('response', function(resp) {
@@ -65,7 +66,7 @@ function download(url, opts, cb) {
     var bar = Array(Math.floor(50 * pct / 100)).join('=')+'>'
     while (bar.length < 50) bar += ' '
    
-    log(
+    _log(
       'Downloading '+path.basename(opts.target)+'\n'+
       '['+bar+'] '+pct.toFixed(1)+'%   \n'
     )
@@ -76,3 +77,4 @@ function download(url, opts, cb) {
   }
 }
 
+function noop () {}
