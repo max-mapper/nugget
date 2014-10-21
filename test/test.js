@@ -18,7 +18,20 @@ testServer.listen(0, function() {
       t.ok(fs.existsSync(target), 'downloaded file')
       if (fs.existsSync(target)) fs.unlinkSync(target)
       t.end()
+    })
+  })
+  
+  test('has progress events', function(t) {
+    var gotProgress = false
+    var dl = nugget('http://localhost:' + port + '/resume.html', {dir: __dirname}, function(err) {
+      t.notOk(err, 'no error')
+      t.ok(gotProgress, 'got progress event')
+      t.end()
       testServer.close()
+    })
+    dl.once('progress', function(data) {
+      t.ok(data.hasOwnProperty('percentage'), 'has percentage')
+      gotProgress = true
     })
   })
 })
