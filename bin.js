@@ -14,7 +14,8 @@ var opts = {
   dir:     args.d || args.dir,
   resume:  args.c || args.continue,
   force:   args.f || args.force,
-  verbose: args.verbose === undefined ? process.stdin.isTTY : args.verbose
+  verbose: args.verbose === undefined ? process.stdin.isTTY : args.verbose,
+  frequency: args.frequency ? +args.frequency : null
 }
 
 nugget(url, opts, function(err) {

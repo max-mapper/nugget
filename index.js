@@ -3,6 +3,8 @@ var fs = require('fs')
 var path = require('path')
 var log = require('single-line-log').stdout
 var progress = require('progress-stream')
+var prettyBytes = require('pretty-bytes')
+var throttle = require('throttleit')
 var EventEmitter = require('events').EventEmitter
 
 function noop () {}
@@ -54,16 +56,20 @@ module.exports = function(url, opts, cb) {
     }
     var _log = opts.verbose ? log : noop
     var read = request(url, { headers: headers })
+    var throttledRender = throttle(render, opts.frequency || 100)
+    var speed = "0 Kb"
+    
     read.on('error', cb)
     read.on('response', function(resp) {
       if (resp.statusCode > 299 && !opts.force) return cb(new Error('GET ' + url + ' returned ' + resp.statusCode))
       var write = fs.createWriteStream(opts.target, {flags: opts.resume ? 'a' : 'w'})
       write.on('error', cb)
       write.on('finish', cb)
- 
+         
       var progressStream = progress({ length: Number(resp.headers['content-length']) }, onprogress)
       
       progressStream.on('progress', function(data) {
+        speed = prettyBytes(data.speed)
         progressEmitter.emit('progress', data)
       })
       
@@ -71,6 +77,7 @@ module.exports = function(url, opts, cb) {
       resp
         .pipe(progressStream)
         .pipe(write)
+      
     })
 
     function render(pct) {
@@ -79,12 +86,14 @@ module.exports = function(url, opts, cb) {
    
       _log(
         'Downloading '+path.basename(opts.target)+'\n'+
-        '['+bar+'] '+pct.toFixed(1)+'%   \n'
+        '['+bar+'] '+pct.toFixed(1)+'% (' + speed + '/s)\n'
       )
     }
    
     function onprogress(p) {
-      render(p.percentage)
+      var pct = p.percentage
+      if (pct === 100) render(pct)
+      else throttledRender(pct)
     }
   }
 }
