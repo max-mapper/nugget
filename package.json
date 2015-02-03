@@ -1,6 +1,6 @@
 {
   "name": "nugget",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "minimalist wget clone written in node. HTTP GETs a file and saves it to the current working directory",
   "main": "index.js",
   "bin": {
