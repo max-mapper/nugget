@@ -13,6 +13,7 @@
   "license": "BSD",
   "dependencies": {
     "minimist": "^1.1.0",
+    "pretty-bytes": "^1.0.2",
     "progress-stream": "^0.5.0",
     "request": "^2.45.0",
     "single-line-log": "^0.4.1",
