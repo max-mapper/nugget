@@ -9,8 +9,55 @@ var EventEmitter = require('events').EventEmitter
 
 function noop () {}
 
-module.exports = function(url, opts, cb) {
-  opts.target = path.resolve(opts.dir || process.cwd(), opts.target || path.basename(url))
+module.exports = function(urls, opts, cb) {
+  if (!Array.isArray(urls)) urls = [urls]
+  var downloads = []
+  var pending = 0
+  urls.forEach(function (url) {
+    var dl = startDownload(url, opts, function done (err) {
+      if (err) throw err
+      if (--pending === 0) {
+        render()
+        cb()
+      }
+    })
+    downloads.push(dl)
+    dl.on('start', function (progressStream) {
+      throttledRender()
+    })
+    
+    dl.on('progress', function(data) {
+      dl.speed = data.speed
+      if (dl.percentage === 100) render()
+      else throttledRender()
+    })
+  })
+  
+  var _log = opts.verbose ? log : noop
+  
+  render()
+  
+  var throttledRender = throttle(render, opts.frequency || 100)
+  
+  function render () {
+    var output = ""
+    var totalSpeed = 0
+    downloads.forEach(function (dl) {
+      var pct = dl.percentage
+      var speed = dl.speed
+      totalSpeed += speed
+      var bar = Array(Math.floor(50 * pct / 100)).join('=')+'>'
+      while (bar.length < 50) bar += ' '
+      output += 'Downloading '+path.basename(dl.target)+'\n'+
+      '['+bar+'] '+pct.toFixed(1)+'% (' + prettyBytes(speed) + '/s)\n'
+    })
+    if (downloads.length > 1) output += '\nCombined Speed: ' + prettyBytes(totalSpeed) + '/s\n'
+    _log(output)
+  }
+}
+
+function startDownload (url, opts, cb) {
+  var target = path.resolve(opts.dir || process.cwd(), path.basename(url))
   if (opts.resume) {
     resume(url, opts, cb)
   } else {
@@ -18,10 +65,14 @@ module.exports = function(url, opts, cb) {
   }
 
   var progressEmitter = new EventEmitter()
+  progressEmitter.target = target
+  progressEmitter.speed = 0
+  progressEmitter.percentage = 0
+  
   return progressEmitter
 
   function resume(url, opts, cb) {
-    fs.stat(opts.target, function (err, stats) {
+    fs.stat(target, function (err, stats) {
       if (err && err.code === 'ENOENT') {
         return download(url, opts, cb)
       }
@@ -54,46 +105,31 @@ module.exports = function(url, opts, cb) {
     if (opts.range) {
       headers.Range = 'bytes=' + opts.range[0] + '-' + opts.range[1]
     }
-    var _log = opts.verbose ? log : noop
     var read = request(url, { headers: headers })
-    var throttledRender = throttle(render, opts.frequency || 100)
     var speed = "0 Kb"
 
     read.on('error', cb)
     read.on('response', function(resp) {
       if (resp.statusCode > 299 && !opts.force) return cb(new Error('GET ' + url + ' returned ' + resp.statusCode))
-      var write = fs.createWriteStream(opts.target, {flags: opts.resume ? 'a' : 'w'})
+      var write = fs.createWriteStream(target, {flags: opts.resume ? 'a' : 'w'})
       write.on('error', cb)
       write.on('finish', cb)
-
-      var progressStream = progress({ length: Number(resp.headers['content-length']) }, onprogress)
-
-      progressStream.on('progress', function(data) {
-        speed = prettyBytes(data.speed)
-        progressEmitter.emit('progress', data)
-      })
-
-      render(0)
+      var len = Number(resp.headers['content-length'])
+      progressEmitter.fileSize = len
+      var progressStream = progress({ length: len }, onprogress)
+      
+      progressEmitter.emit('start', progressStream)
+      
       resp
         .pipe(progressStream)
-        .pipe(write)
-
+        .pipe(write)      
     })
 
-    function render(pct) {
-      var bar = Array(Math.floor(50 * pct / 100)).join('=')+'>'
-      while (bar.length < 50) bar += ' '
-
-      _log(
-        'Downloading '+path.basename(opts.target)+'\n'+
-        '['+bar+'] '+pct.toFixed(1)+'% (' + speed + '/s)\n'
-      )
-    }
-
-    function onprogress(p) {
+    function onprogress (p) {
       var pct = p.percentage
-      if (pct === 100) render(pct)
-      else throttledRender(pct)
+      progressEmitter.progress = p
+      progressEmitter.percentage = pct
+      progressEmitter.emit('progress', p)
     }
   }
 }
