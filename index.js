@@ -15,12 +15,13 @@ module.exports = function(urls, opts, cb) {
   if (urls.length === 1) opts.singleTarget = true
   if (opts.sockets) {
     var sockets = +opts.sockets
-    request = request.defaults({pool: {maxSockets: sockets}})    
+    request = request.defaults({pool: {maxSockets: sockets}})
   }
   var downloads = []
   var errors = []
   var pending = 0
-    
+  var truncated = urls.length * 2 >= (process.stdout.rows - 15)
+
   urls.forEach(function (url) {
     debug('start dl', url)
     pending++
@@ -31,39 +32,52 @@ module.exports = function(urls, opts, cb) {
         errors.push(err)
         dl.error = err.message
       }
+      if (truncated) {
+        var i = downloads.indexOf(dl)
+        downloads.splice(i, 1)
+        downloads.push(dl)
+      }
       if (--pending === 0) {
         render()
         cb(errors.length ? errors : undefined)
       }
     })
-    
+
     downloads.push(dl)
-    
+
     dl.on('start', function (progressStream) {
       throttledRender()
     })
-    
+
     dl.on('progress', function(data) {
       debug('progress', url, data.percentage)
-      
+
       dl.speed = data.speed
       if (dl.percentage === 100) render()
       else throttledRender()
     })
   })
-  
+
   var _log = opts.verbose ? log : noop
   render()
   var throttledRender = throttle(render, opts.frequency || 100)
-  
+
   if (opts.singleTarget) return downloads[0]
   else return downloads
-  
+
   function render () {
+    var height = process.stdout.rows
+    var rendered = 0
     var output = ""
     var totalSpeed = 0
     downloads.forEach(function (dl) {
-      if (dl.error) return output += 'Error downloading ' + path.basename(dl.target)
+      if (2 * rendered >= height - 15) return
+      rendered++
+      if (dl.error) {
+        output += 'Downloading '+path.basename(dl.target)+'\n'
+        output += 'Error: ' + dl.error + '\n'
+        return
+      }
       var pct = dl.percentage
       var speed = dl.speed
       totalSpeed += speed
@@ -72,10 +86,11 @@ module.exports = function(urls, opts, cb) {
       output += 'Downloading '+path.basename(dl.target)+'\n'+
       '['+bar+'] '+pct.toFixed(1)+'% (' + prettyBytes(speed) + '/s)\n'
     })
+    if (rendered < downloads.length) output += '\n... and ' + (downloads.length - rendered) + ' more\n'
     if (downloads.length > 1) output += '\nCombined Speed: ' + prettyBytes(totalSpeed) + '/s\n'
     _log(output)
   }
-  
+
   function startDownload (url, opts, cb) {
     var targetName = path.basename(url)
     if (opts.singleTarget && opts.target) targetName = opts.target
@@ -90,7 +105,7 @@ module.exports = function(urls, opts, cb) {
     progressEmitter.target = target
     progressEmitter.speed = 0
     progressEmitter.percentage = 0
-  
+
     return progressEmitter
 
     function resume(url, opts, cb) {
@@ -137,7 +152,7 @@ module.exports = function(urls, opts, cb) {
         var write = fs.createWriteStream(target, {flags: opts.resume ? 'a' : 'w'})
         write.on('error', cb)
         write.on('finish', cb)
-        
+
         var fullLen
         var contentLen = Number(resp.headers['content-length'])
         var range = resp.headers['content-range']
@@ -146,18 +161,17 @@ module.exports = function(urls, opts, cb) {
         } else {
           fullLen = contentLen
         }
-        
+
         progressEmitter.fileSize = fullLen
         if (range) {
           var downloaded = fullLen - contentLen
         }
         var progressStream = progress({ length: fullLen, transferred: downloaded }, onprogress)
-      
         progressEmitter.emit('start', progressStream)
-      
+
         resp
           .pipe(progressStream)
-          .pipe(write)      
+          .pipe(write)
       })
 
       function onprogress (p) {
