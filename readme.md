@@ -28,6 +28,10 @@ nugget http://foo.com/bar.jpg -O baz.jpg
 
 if you get a statusCode of 300 or greater nugget will stop. you can force it to stream the response into a file anyway by doing `nugget http://404link.com/file.html -f` or `--force` works too
 
+you can also download multiple files, just pass multiple urls:
+
+![download multiple](multiple.png)
+
 ## options
 
 The following options are recognized by nugget:

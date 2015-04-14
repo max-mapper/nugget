@@ -3,21 +3,23 @@
 var nugget = require('./')
 var args = require('minimist')(process.argv.slice(2))
 
-var url = args._
-if (url.length === 0) {
-  console.error("Usage: nugget <url> [-O saveAs]")
+var urls = args._
+if (urls.length === 0) {
+  console.error("Usage: nugget <urls> [-O saveAs]")
   process.exit(1)
 }
 
 var opts = {
-  dir:     args.d || args.dir,
-  resume:  args.c || args.continue,
-  force:   args.f || args.force,
-  verbose: args.verbose === undefined ? process.stdin.isTTY : args.verbose,
+  target:    args.o || args.O || args.out,
+  dir:       args.d || args.dir,
+  resume:    args.c || args.continue,
+  force:     args.f || args.force,
+  sockets:   args.s || args.sockets,
+  verbose:   args.verbose === undefined ? process.stdin.isTTY : args.verbose,
   frequency: args.frequency ? +args.frequency : null
 }
 
-nugget(url, opts, function(err) {
+nugget(urls, opts, function(err) {
   if (err) {
     console.error('Error:', err.message)
     process.exit(1)
