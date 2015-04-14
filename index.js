@@ -60,7 +60,7 @@ module.exports = function(urls, opts, cb) {
 
   var _log = opts.verbose ? log : noop
   render()
-  var throttledRender = throttle(render, opts.frequency || 100)
+  var throttledRender = throttle(render, opts.frequency || 250)
 
   if (opts.singleTarget) return downloads[0]
   else return downloads

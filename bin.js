@@ -21,7 +21,7 @@ var opts = {
 
 nugget(urls, opts, function(err) {
   if (err) {
-    console.error('Error:', err.message)
+    console.error('Error:', err)
     process.exit(1)
   }
   process.exit(0)
