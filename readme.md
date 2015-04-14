@@ -36,7 +36,8 @@ you can also download multiple files, just pass multiple urls:
 
 The following options are recognized by nugget:
 
- * `-o|-O|--out` - specify the filename to write to.
+ * `-s|--sockets` - default Infinity. specify the number of http sockets to use at once (this controls concurrency)
+ * `-o|-O|--out` - specify the filename to write to. this only works if you are downloading a single file
  * `-d|--dir` - save files in a directory other than the current one.
  * `-c|--continue` - resume downloads if a partially complete target file already exists. If the target file exists and is the same size as the remote file, nothing will be done.
  * `-f|--force` - force the server response to be saved to the target file, even if it's a non-successful status code.
