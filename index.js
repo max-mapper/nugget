@@ -137,9 +137,21 @@ module.exports = function(urls, opts, cb) {
         var write = fs.createWriteStream(target, {flags: opts.resume ? 'a' : 'w'})
         write.on('error', cb)
         write.on('finish', cb)
-        var len = Number(resp.headers['content-length'])
-        progressEmitter.fileSize = len
-        var progressStream = progress({ length: len }, onprogress)
+        
+        var fullLen
+        var contentLen = Number(resp.headers['content-length'])
+        var range = resp.headers['content-range']
+        if (range) {
+          fullLen = Number(range.split('/')[1])
+        } else {
+          fullLen = contentLen
+        }
+        
+        progressEmitter.fileSize = fullLen
+        if (range) {
+          var downloaded = fullLen - contentLen
+        }
+        var progressStream = progress({ length: fullLen, transferred: downloaded }, onprogress)
       
         progressEmitter.emit('start', progressStream)
       
