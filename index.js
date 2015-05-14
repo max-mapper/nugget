@@ -80,11 +80,14 @@ module.exports = function(urls, opts, cb) {
       }
       var pct = dl.percentage
       var speed = dl.speed
+      var total = dl.fileSize
       totalSpeed += speed
       var bar = Array(Math.floor(50 * pct / 100)).join('=')+'>'
       while (bar.length < 50) bar += ' '
       output += 'Downloading '+path.basename(dl.target)+'\n'+
-      '['+bar+'] '+pct.toFixed(1)+'% (' + prettyBytes(speed) + '/s)\n'
+      '['+bar+'] '+pct.toFixed(1)+'%'
+      if (total) output += ' of ' + prettyBytes(total)
+      output += ' (' + prettyBytes(speed) + '/s)\n'
     })
     if (rendered < downloads.length) output += '\n... and ' + (downloads.length - rendered) + ' more\n'
     if (downloads.length > 1) output += '\nCombined Speed: ' + prettyBytes(totalSpeed) + '/s\n'
