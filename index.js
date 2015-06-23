@@ -1,11 +1,13 @@
-var request = require('request')
 var fs = require('fs')
+var http = require('http')
 var path = require('path')
+var EventEmitter = require('events').EventEmitter
+var got = require('got')
+var isRedirect = require('is-redirect')
 var log = require('single-line-log').stdout
 var progress = require('progress-stream')
 var prettyBytes = require('pretty-bytes')
 var throttle = require('throttleit')
-var EventEmitter = require('events').EventEmitter
 var debug = require('debug')('nugget')
 
 function noop () {}
@@ -13,14 +15,15 @@ function noop () {}
 module.exports = function(urls, opts, cb) {
   if (!Array.isArray(urls)) urls = [urls]
   if (urls.length === 1) opts.singleTarget = true
-  if (opts.sockets) {
-    var sockets = +opts.sockets
-    request = request.defaults({pool: {maxSockets: sockets}})
-  }
   var downloads = []
   var errors = []
   var pending = 0
   var truncated = urls.length * 2 >= (process.stdout.rows - 15)
+  
+  var agent
+  if (opts.sockets) {
+    agent = new http.Agent({ maxSockets: +opts.sockets })
+  }
 
   urls.forEach(function (url) {
     debug('start dl', url)
@@ -111,7 +114,7 @@ module.exports = function(urls, opts, cb) {
 
     return progressEmitter
 
-    function resume(url, opts, cb) {
+    function resume (url, opts, cb) {
       fs.stat(target, function (err, stats) {
         if (err && err.code === 'ENOENT') {
           return download(url, opts, cb)
@@ -120,10 +123,10 @@ module.exports = function(urls, opts, cb) {
           return cb(err)
         }
         var offset = stats.size
-        var req = request.get(url)
+        var req = got.get(url, {agent: agent})
 
         req.on('error', cb)
-        req.on('response', function(resp) {
+        req.on('response', function (resp) {
           resp.destroy()
 
           var length = parseInt(resp.headers['content-length'], 10)
@@ -145,12 +148,13 @@ module.exports = function(urls, opts, cb) {
       if (opts.range) {
         headers.Range = 'bytes=' + opts.range[0] + '-' + opts.range[1]
       }
-      var read = request(url, { headers: headers })
+      var read = got.get(url, { headers: headers, agent: agent })
       var speed = "0 Kb"
 
       read.on('error', cb)
       read.on('response', function(resp) {
         debug('response', url, resp.statusCode)
+        if (isRedirect(resp.statusCode)) return // hack for https://github.com/sindresorhus/got/issues/75
         if (resp.statusCode > 299 && !opts.force) return cb(new Error('GET ' + url + ' returned ' + resp.statusCode))
         var write = fs.createWriteStream(target, {flags: opts.resume ? 'a' : 'w'})
         write.on('error', cb)
