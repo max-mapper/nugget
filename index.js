@@ -95,7 +95,7 @@ module.exports = function(urls, opts, cb) {
   }
 
   function startDownload (url, opts, cb) {
-    var targetName = path.basename(url)
+    var targetName = path.basename(url).split('?')[0]
     if (opts.singleTarget && opts.target) targetName = opts.target
     var target = path.resolve(opts.dir || process.cwd(), targetName)
     if (opts.resume) {
