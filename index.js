@@ -82,8 +82,8 @@ module.exports = function(urls, opts, cb) {
       var speed = dl.speed
       var total = dl.fileSize
       totalSpeed += speed
-      var bar = Array(Math.floor(50 * pct / 100)).join('=')+'>'
-      while (bar.length < 50) bar += ' '
+      var bar = Array(Math.floor(45 * pct / 100)).join('=')+'>'
+      while (bar.length < 45) bar += ' '
       output += 'Downloading '+path.basename(dl.target)+'\n'+
       '['+bar+'] '+pct.toFixed(1)+'%'
       if (total) output += ' of ' + prettyBytes(total)
