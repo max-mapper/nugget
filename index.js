@@ -13,10 +13,26 @@ function noop () {}
 module.exports = function(urls, opts, cb) {
   if (!Array.isArray(urls)) urls = [urls]
   if (urls.length === 1) opts.singleTarget = true
+
+  var defaultProps = {};
+
   if (opts.sockets) {
     var sockets = +opts.sockets
-    request = request.defaults({pool: {maxSockets: sockets}})
+    defaultProps.pool = {maxSockets: sockets}
   }
+
+  if (opts.proxy) {
+    defaultProps.proxy = opts.proxy
+  }
+
+  if (opts.strictSSL !== null) {
+    defaultProps.strictSSL = opts.strictSSL
+  }
+
+  if (Object.keys(defaultProps).length > 0) {
+    request = request.defaults(defaultProps);
+  }
+
   var downloads = []
   var errors = []
   var pending = 0
