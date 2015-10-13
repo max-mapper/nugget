@@ -41,3 +41,4 @@ The following options are recognized by nugget:
  * `-d|--dir` - save files in a directory other than the current one.
  * `-c|--continue` - resume downloads if a partially complete target file already exists. If the target file exists and is the same size as the remote file, nothing will be done.
  * `-f|--force` - force the server response to be saved to the target file, even if it's a non-successful status code.
+ * `--no-strict-ssl` - disable strict ssl

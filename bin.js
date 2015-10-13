@@ -18,7 +18,7 @@ var opts = {
   verbose:   args.verbose === undefined ? process.stdin.isTTY : args.verbose,
   frequency: args.frequency ? +args.frequency : null,
   proxy:     args.proxy ? args.proxy : null,
-  strictSSL: args['strict-ssl'] !== null ? args['strict-ssl'] !== 'false' : null
+  strictSSL: args['strict-ssl']
 }
 
 nugget(urls, opts, function(err) {
