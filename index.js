@@ -10,6 +10,15 @@ var debug = require('debug')('nugget')
 
 function noop () {}
 
+// from node-gyp
+function readCAFile (filename) {
+  // The CA file can contain multiple certificates so split on certificate
+  // boundaries.  [\S\s]*? is used to match everything including newlines.
+  var ca = fs.readFileSync(filename, 'utf8')
+  var re = /(-----BEGIN CERTIFICATE-----[\S\s]*?-----END CERTIFICATE-----)/g
+  return ca.match(re)
+}
+
 module.exports = function(urls, opts, cb) {
   if (!Array.isArray(urls)) urls = [urls]
   if (urls.length === 1) opts.singleTarget = true
@@ -27,6 +36,12 @@ module.exports = function(urls, opts, cb) {
 
   if (opts.strictSSL !== null) {
     defaultProps.strictSSL = opts.strictSSL
+  }
+
+  var cafile = opts.cafile || process.env.npm_config_cafile;
+
+  if (cafile) {
+    defaultProps.ca = readCAFile(cafile)
   }
 
   if (Object.keys(defaultProps).length > 0) {
