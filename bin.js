@@ -5,7 +5,14 @@ var args = require('minimist')(process.argv.slice(2))
 
 var urls = args._
 if (urls.length === 0) {
-  console.error("Usage: nugget <urls> [-O saveAs]")
+  console.error(
+    "Usage: nugget <urls> [options]\n" +
+    "  -o    output filename\n" +
+    "  -d    output parent directory\n" +
+    "  -c    resume aborted download\n" +
+    "  -f    ignore response codes > 299\n" +
+    "  -s    concurrent socket limit (default infinity)"
+  )
   process.exit(1)
 }
 
