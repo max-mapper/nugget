@@ -1,6 +1,6 @@
 # nugget
 
-minimalist wget clone written in node. HTTP GETs a file and streams it into a file in the current working directory
+Minimalist command line downloader written in node, inspired by wget. HTTP GETs a file and streams it into a file in the current working directory. Specializes at downloading many files in parallel.
 
 [![NPM](https://nodei.co/npm/nugget.png?global=true)](https://nodei.co/npm/nugget/)
 ![dat](http://img.shields.io/badge/Development%20sponsored%20by-dat-green.svg?style=flat)
