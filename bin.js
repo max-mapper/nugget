@@ -22,7 +22,7 @@ var opts = {
   resume:    args.c || args.continue,
   force:     args.f || args.force,
   sockets:   args.s || args.sockets,
-  verbose:   args.verbose === undefined ? process.stdout.isTTY : args.verbose,
+  verbose:   args.verbose === undefined ? process.stdin.isTTY : args.verbose,
   frequency: args.frequency ? +args.frequency : null,
   proxy:     args.proxy ? args.proxy : null,
   strictSSL: args['strict-ssl']
