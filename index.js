@@ -74,7 +74,7 @@ module.exports = function(urls, opts, cb) {
     })
   })
 
-  var _log = opts.verbose ? log : noop
+  var _log = opts.quiet ? noop : log
   render()
   var throttledRender = throttle(render, opts.frequency || 250)
 

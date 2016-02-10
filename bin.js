@@ -11,7 +11,8 @@ if (urls.length === 0) {
     "  -d    output parent directory\n" +
     "  -c    resume aborted download\n" +
     "  -f    ignore response codes > 299\n" +
-    "  -s    concurrent socket limit (default infinity)"
+    "  -s    concurrent socket limit (default infinity)\n" +
+    "  -q    disable logging"
   )
   process.exit(1)
 }
@@ -22,7 +23,7 @@ var opts = {
   resume:    args.c || args.continue,
   force:     args.f || args.force,
   sockets:   args.s || args.sockets,
-  verbose:   args.verbose === undefined ? process.stdout.isTTY : args.verbose,
+  quiet:     args.q || args.quiet,
   frequency: args.frequency ? +args.frequency : null,
   proxy:     args.proxy ? args.proxy : null,
   strictSSL: args['strict-ssl']
