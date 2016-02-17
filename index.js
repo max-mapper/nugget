@@ -10,11 +10,11 @@ var debug = require('debug')('nugget')
 
 function noop () {}
 
-module.exports = function(urls, opts, cb) {
+module.exports = function (urls, opts, cb) {
   if (!Array.isArray(urls)) urls = [urls]
   if (urls.length === 1) opts.singleTarget = true
 
-  var defaultProps = {};
+  var defaultProps = {}
 
   if (opts.sockets) {
     var sockets = +opts.sockets
@@ -30,7 +30,7 @@ module.exports = function(urls, opts, cb) {
   }
 
   if (Object.keys(defaultProps).length > 0) {
-    request = request.defaults(defaultProps);
+    request = request.defaults(defaultProps)
   }
 
   var downloads = []
@@ -65,7 +65,7 @@ module.exports = function(urls, opts, cb) {
       throttledRender()
     })
 
-    dl.on('progress', function(data) {
+    dl.on('progress', function (data) {
       debug('progress', url, data.percentage)
 
       dl.speed = data.speed
@@ -84,13 +84,13 @@ module.exports = function(urls, opts, cb) {
   function render () {
     var height = process.stdout.rows
     var rendered = 0
-    var output = ""
+    var output = ''
     var totalSpeed = 0
     downloads.forEach(function (dl) {
       if (2 * rendered >= height - 15) return
       rendered++
       if (dl.error) {
-        output += 'Downloading '+path.basename(dl.target)+'\n'
+        output += 'Downloading ' + path.basename(dl.target) + '\n'
         output += 'Error: ' + dl.error + '\n'
         return
       }
@@ -98,10 +98,10 @@ module.exports = function(urls, opts, cb) {
       var speed = dl.speed
       var total = dl.fileSize
       totalSpeed += speed
-      var bar = Array(Math.floor(45 * pct / 100)).join('=')+'>'
+      var bar = Array(Math.floor(45 * pct / 100)).join('=') + '>'
       while (bar.length < 45) bar += ' '
-      output += 'Downloading '+path.basename(dl.target)+'\n'+
-      '['+bar+'] '+pct.toFixed(1)+'%'
+      output += 'Downloading ' + path.basename(dl.target) + '\n' +
+      '[' + bar + '] ' + pct.toFixed(1) + '%'
       if (total) output += ' of ' + prettyBytes(total)
       output += ' (' + prettyBytes(speed) + '/s)\n'
     })
@@ -127,7 +127,7 @@ module.exports = function(urls, opts, cb) {
 
     return progressEmitter
 
-    function resume(url, opts, cb) {
+    function resume (url, opts, cb) {
       fs.stat(target, function (err, stats) {
         if (err && err.code === 'ENOENT') {
           return download(url, opts, cb)
@@ -139,7 +139,7 @@ module.exports = function(urls, opts, cb) {
         var req = request.get(url)
 
         req.on('error', cb)
-        req.on('response', function(resp) {
+        req.on('response', function (resp) {
           resp.destroy()
 
           var length = parseInt(resp.headers['content-length'], 10)
@@ -156,16 +156,15 @@ module.exports = function(urls, opts, cb) {
       })
     }
 
-    function download(url, opts, cb) {
+    function download (url, opts, cb) {
       var headers = opts.headers || {}
       if (opts.range) {
         headers.Range = 'bytes=' + opts.range[0] + '-' + opts.range[1]
       }
       var read = request(url, { headers: headers })
-      var speed = "0 Kb"
 
       read.on('error', cb)
-      read.on('response', function(resp) {
+      read.on('response', function (resp) {
         debug('response', url, resp.statusCode)
         if (resp.statusCode > 299 && !opts.force) return cb(new Error('GET ' + url + ' returned ' + resp.statusCode))
         var write = fs.createWriteStream(target, {flags: opts.resume ? 'a' : 'w'})

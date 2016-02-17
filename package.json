@@ -7,7 +7,7 @@
     "nugget": "bin.js"
   },
   "scripts": {
-    "test": "tape test/*.js"
+    "test": "standard && tape test/*.js"
   },
   "author": "max ogden",
   "license": "BSD",
@@ -21,6 +21,7 @@
     "throttleit": "0.0.2"
   },
   "devDependencies": {
+    "standard": "^6.0.5",
     "tape": "^3.0.1"
   },
   "directories": {
