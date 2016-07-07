@@ -44,6 +44,8 @@ you can also download multiple files, just pass multiple urls:
 
 ![download multiple](multiple.png)
 
+The bash shell expands the `{...}` syntax into multiple arguments.
+
 ## options
 
 The following options are recognized by nugget:
