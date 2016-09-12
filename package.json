@@ -17,12 +17,13 @@
     "pretty-bytes": "^1.0.2",
     "progress-stream": "^1.1.0",
     "request": "^2.45.0",
-    "single-line-log": "^0.4.1",
+    "single-line-log": "^1.1.2",
     "throttleit": "0.0.2"
   },
   "devDependencies": {
     "standard": "^6.0.5",
-    "tape": "^3.0.1"
+    "tape": "^3.0.1",
+    "tape-spawn": "^1.4.2"
   },
   "directories": {
     "test": "test"
