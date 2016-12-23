@@ -26,7 +26,7 @@ var opts = require('minimist')(process.argv.slice(2), {
     resume: 'continue',
     strictSSL: 'strict-ssl'
   }
-});
+})
 
 var urls = opts._
 if (urls.length === 0) {
@@ -35,7 +35,7 @@ if (urls.length === 0) {
 }
 
 if (opts.frequency) {
-  opts.frequency = +opts.frequency; 
+  opts.frequency = +opts.frequency
 }
 
 nugget(urls, opts, function (err) {
