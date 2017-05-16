@@ -16,12 +16,14 @@ npm install nugget -g
 
 ```
 Usage: nugget <urls> [options]
-  -o    output filename
-  -d    output parent directory
-  -c    resume aborted download
-  -f    ignore response codes > 299
-  -s    concurrent socket limit (default infinity)
-  -q    disable logging
+  -o, --output     output filename
+  -d, --dir        output parent directory
+  -c, --continue   resume aborted download
+  -f, --force      ignore response codes > 299
+  -s, --sockets    concurrent socket limit (default infinity)
+  -q, --quiet      disable logging
+  --proxy          specify a proxy to use
+  --no-strict-ssl  disable strict SSL cehcking
 ```
 
 ### examples
@@ -48,11 +50,11 @@ you can also download multiple files, just pass multiple urls:
 
 The following options are recognized by nugget:
 
- * `-s|--sockets` - default Infinity. specify the number of http sockets to use at once (this controls concurrency)
  * `-o|-O|--out` - specify the filename to write to. this only works if you are downloading a single file
  * `-d|--dir` - save files in a directory other than the current one.
  * `-c|--continue` - resume downloads if a partially complete target file already exists. If the target file exists and is the same size as the remote file, nothing will be done.
  * `-f|--force` - force the server response to be saved to the target file, even if it's a non-successful status code.
+ * `-s|--sockets` - default Infinity. specify the number of http sockets to use at once (this controls concurrency)
  * `-q|--quiet` - disable logging
- * `--no-strict-ssl` - disable strict ssl
  * `--proxy` - specify a proxy to use
+ * `--no-strict-ssl` - disable strict ssl
