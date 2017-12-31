@@ -3,7 +3,7 @@
 var fs = require('fs')
 var path = require('path')
 var nugget = require('./')
-var args = require('minimist')(process.argv.slice(2))
+var args = require('gar')(process.argv.slice(2))
 
 var urls = args._
 if (urls.length === 0) {
