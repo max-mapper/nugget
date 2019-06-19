@@ -87,12 +87,12 @@ module.exports = function (urls, opts, cb) {
     var output = ''
     var totalSpeed = 0
     downloads.forEach(function (dl) {
-      var pct = dl.percentage;
-      var speed = dl.speed;
-      var total = dl.fileSize;
-      totalSpeed += speed;
-      if (2 * rendered >= height - 8) return;
-      rendered++;
+      var pct = dl.percentage
+      var speed = dl.speed
+      var total = dl.fileSize
+      totalSpeed += speed
+      if (2 * rendered >= height - 8) return
+      rendered++
       if (dl.error) {
         output += 'Downloading ' + path.basename(dl.target) + '\n'
         output += 'Error: ' + dl.error + '\n'
