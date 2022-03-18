@@ -87,17 +87,17 @@ module.exports = function (urls, opts, cb) {
     var output = ''
     var totalSpeed = 0
     downloads.forEach(function (dl) {
-      if (2 * rendered >= height - 15) return
+      var pct = dl.percentage
+      var speed = dl.speed
+      var total = dl.fileSize
+      totalSpeed += speed
+      if (2 * rendered >= height - 8) return
       rendered++
       if (dl.error) {
         output += 'Downloading ' + path.basename(dl.target) + '\n'
         output += 'Error: ' + dl.error + '\n'
         return
       }
-      var pct = dl.percentage
-      var speed = dl.speed
-      var total = dl.fileSize
-      totalSpeed += speed
       var bar = Array(Math.floor(45 * pct / 100)).join('=') + '>'
       while (bar.length < 45) bar += ' '
       output += 'Downloading ' + path.basename(dl.target) + '\n' +
