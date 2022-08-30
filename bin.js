@@ -20,6 +20,7 @@ var opts = {
   quiet: args.q || args.quiet,
   frequency: args.frequency ? +args.frequency : null,
   proxy: args.proxy ? args.proxy : null,
+  tmpfile: args.t || args.tmpfile,
   strictSSL: args['strict-ssl']
 }
 

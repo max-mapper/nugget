@@ -22,6 +22,7 @@ Usage: nugget <urls> [options]
   -f, --force      ignore response codes > 299
   -s, --sockets    concurrent socket limit (default infinity)
   -q, --quiet      disable logging
+  -t, --tmpfile    write files to <name>.tmp while downloading
   --proxy          specify a proxy to use
   --no-strict-ssl  disable strict SSL cehcking
 ```
@@ -50,11 +51,12 @@ you can also download multiple files, just pass multiple urls:
 
 The following options are recognized by nugget:
 
- * `-o|-O|--out` - specify the filename to write to. this only works if you are downloading a single file
- * `-d|--dir` - save files in a directory other than the current one.
- * `-c|--continue` - resume downloads if a partially complete target file already exists. If the target file exists and is the same size as the remote file, nothing will be done.
- * `-f|--force` - force the server response to be saved to the target file, even if it's a non-successful status code.
- * `-s|--sockets` - default Infinity. specify the number of http sockets to use at once (this controls concurrency)
- * `-q|--quiet` - disable logging
- * `--proxy` - specify a proxy to use
- * `--no-strict-ssl` - disable strict ssl
+- `-o|-O|--out` - specify the filename to write to. this only works if you are downloading a single file
+- `-d|--dir` - save files in a directory other than the current one.
+- `-c|--continue` - resume downloads if a partially complete target file already exists. If the target file exists and is the same size as the remote file, nothing will be done.
+- `-f|--force` - force the server response to be saved to the target file, even if it's a non-successful status code.
+- `-s|--sockets` - default Infinity. specify the number of http sockets to use at once (this controls concurrency)
+- `-q|--quiet` - disable logging
+- `-t, --tmpfile` - write files to <name>.tmp while downloading
+- `--proxy` - specify a proxy to use
+- `--no-strict-ssl` - disable strict ssl

@@ -114,6 +114,10 @@ module.exports = function (urls, opts, cb) {
     var targetName = path.basename(url).split('?')[0]
     if (opts.singleTarget && opts.target) targetName = opts.target
     var target = path.resolve(opts.dir || process.cwd(), targetName)
+    var origTarget = target
+    if (opts.tmpfile) {
+      target = target + '.tmp'
+    }
     if (opts.resume) {
       resume(url, opts, cb)
     } else {
@@ -169,7 +173,13 @@ module.exports = function (urls, opts, cb) {
         if (resp.statusCode > 299 && !opts.force) return cb(new Error('GET ' + url + ' returned ' + resp.statusCode))
         var write = fs.createWriteStream(target, {flags: opts.resume ? 'a' : 'w'})
         write.on('error', cb)
-        write.on('finish', cb)
+        write.on('finish', async () => {
+          if (opts.tmpfile) {
+            fs.rename(target, origTarget, cb)
+          } else {
+            process.nextTick(cb)
+          }
+        })
 
         var fullLen
         var contentLen = Number(resp.headers['content-length'])
