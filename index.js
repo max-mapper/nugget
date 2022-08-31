@@ -95,7 +95,7 @@ module.exports = function (urls, opts, cb) {
         return
       }
       var pct = dl.percentage
-      var speed = dl.speed
+      var speed = dl.speed || 0
       var total = dl.fileSize
       totalSpeed += speed
       var bar = Array(Math.floor(45 * pct / 100)).join('=') + '>'
@@ -129,10 +129,17 @@ module.exports = function (urls, opts, cb) {
     progressEmitter.speed = 0
     progressEmitter.percentage = 0
 
+    function onprogress (p) {
+      var pct = p.percentage
+      progressEmitter.progress = p
+      progressEmitter.percentage = pct
+      progressEmitter.emit('progress', p)
+    }
+
     return progressEmitter
 
     function resume (url, opts, cb) {
-      fs.stat(target, function (err, stats) {
+      var onStat = function (err, stats) {
         if (err && err.code === 'ENOENT') {
           return download(url, opts, cb)
         }
@@ -149,7 +156,10 @@ module.exports = function (urls, opts, cb) {
           var length = parseInt(resp.headers['content-length'], 10)
 
           // file is already downloaded.
-          if (length === offset) return cb()
+          if (length === offset) {
+            onprogress({percentage: 100})
+            return cb()
+          }
 
           if (!isNaN(length) && length > offset && /bytes/.test(resp.headers['accept-ranges'])) {
             opts.range = [offset, length]
@@ -157,7 +167,21 @@ module.exports = function (urls, opts, cb) {
 
           download(url, opts, cb)
         })
-      })
+      }
+      if (opts.tmpfile) {
+        fs.stat(origTarget, function (err, origStats) {
+          if (err && err.code === 'ENOENT') {
+            fs.stat(target, onStat)
+          } else {
+            // file is already downloaded
+            onprogress({percentage: 100})
+            cb()
+          }
+        })
+      } else {
+        fs.stat(target, onStat)
+      }
+      
     }
 
     function download (url, opts, cb) {
@@ -201,13 +225,6 @@ module.exports = function (urls, opts, cb) {
           .pipe(progressStream)
           .pipe(write)
       })
-
-      function onprogress (p) {
-        var pct = p.percentage
-        progressEmitter.progress = p
-        progressEmitter.percentage = pct
-        progressEmitter.emit('progress', p)
-      }
     }
   }
 }
